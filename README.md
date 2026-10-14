@@ -166,7 +166,8 @@ CSS 像素。两者混用会让**右键菜单、自动补全、Quick Reply 子�
 
 1. 用 CSS `zoom` 作用在 `<html>` 上做整体缩放（Chromium 会连布局一起缩放，`position: fixed` 也能正确贴边）。
 2. CSS `zoom` 不会缩放"视口"本身，所以所有视口单位都要按 `/ var(--tt-ui-zoom)` 换算；
-   样式表规则靠注入最后一张覆盖表（含 `@media` / `@supports` 递归展开），
+   样式表规则的做法是：把每条含视口单位的规则原样抄进最后注入的覆盖表
+   （`@media` / `@supports` 里的嵌套内容也会一起被抄进来并改写），再把单位换成 `calc(长度 / var(--tt-ui-zoom))`；
    内联样式则同时覆盖三条写入路径：`setProperty()`、直接属性赋值（`el.style.width = '100vw'`）、
    以及 `cssText` / `setAttribute` / jQuery `.css()`（用 DOM 变更监听补齐）。
 3. 坐标修正：挂钩 `Element.prototype.getBoundingClientRect`、`Range` 系列、鼠标 / 触摸事件坐标、
