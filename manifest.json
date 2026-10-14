@@ -1,0 +1,13 @@
+{
+    "display_name": "界面缩放 UI Zoom",
+    "loading_order": 90,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "LLPNB-NEW",
+    "version": "1.1.0",
+    "homePage": "https://github.com/LLPNB-NEW/tauritavern-ui-zoom",
+    "auto_update": false,
+    "description": "浏览器式整体界面缩放：Ctrl + 鼠标滚轮 / Ctrl + 加号 / Ctrl + 减号 / Ctrl + 0 缩放整个界面（含弹窗与固定栏），比例自动保存。Browser-like whole-UI zoom."
+}

@@ -1,0 +1,57 @@
+/* UI Zoom — settings drawer + zoom indicator.
+   Only styles this extension's own elements; the zoom itself is applied by index.js. */
+
+#tt_ui_zoom_container .tt-ui-zoom-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+    flex-wrap: wrap;
+}
+
+#tt_ui_zoom_container .tt-ui-zoom-range {
+    flex: 1 1 140px;
+    min-width: 110px;
+    margin: 0;
+    accent-color: var(--SmartThemeQuoteColor, #8ab4f8);
+}
+
+#tt_ui_zoom_container .tt-ui-zoom-value {
+    min-width: 52px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.9;
+}
+
+#tt_ui_zoom_container .tt-ui-zoom-hint {
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+    opacity: 0.75;
+}
+
+#tt_ui_zoom_indicator {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    z-index: 2147483000;
+    display: none;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.25));
+    background-color: var(--SmartThemeBlurTintColor, rgba(0, 0, 0, 0.75));
+    color: var(--SmartThemeBodyColor, #fff);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    /* Keep the bubble at a constant visual size regardless of the zoom factor. */
+    zoom: calc(1 / var(--tt-ui-zoom, 1));
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 120ms ease-out;
+}
+
+#tt_ui_zoom_indicator.visible {
+    display: block;
+    opacity: 1;
+}
