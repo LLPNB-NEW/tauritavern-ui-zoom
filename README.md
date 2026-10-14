@@ -26,34 +26,40 @@ tt 酒馆用的是 Tauri + WebView2。Tauri 出于安全考虑**默认关闭了 
 
 ---
 
-## 安装
+## 安装（推荐：把链接填进酒馆，让它自己装）
 
-### 1. 找到数据目录
+不用手动下载、不用自己找目录，把仓库地址填进 tt 酒馆就行：
 
-tt 酒馆里打开 **用户设置 → TauriTavern 设置 → 数据目录**，例如本机是 `E:\AI\TauriTavern`。
+1. 打开顶栏的 **扩展** 面板（立方体图标）；
+2. 点右上角的 **「安装扩展」** 按钮（悬停提示是"从 Git 仓库导入扩展"）；
+3. 在弹出的窗口里粘贴本仓库地址 —— **「分支或标签名称」留空**：
 
-### 2. 放到扩展目录
+   ```
+   https://github.com/LLPNB-NEW/tauritavern-ui-zoom
+   ```
 
-把本仓库整个文件夹放到 `<数据目录>\extensions\third-party\` 下，目录名用 `ui-zoom`：
+4. 点 **「为所有用户安装」**（只想给自己用就点 **「仅为我安装」**）；
+5. 提示安装成功后，**完全退出 tt 酒馆再重新打开** —— 点窗口右上角的关闭按钮多半只是**最小化到托盘**，请从**托盘图标右键 → 退出**。
 
-```
-E:\AI\TauriTavern\extensions\third-party\ui-zoom\
-    manifest.json
-    index.js
-    style.css
-    README.md
-```
+扩展会被自动装到 `<数据目录>\extensions\third-party\tauritavern-ui-zoom\`（目录名取自仓库名）。
+重启后打开 **扩展** 面板，能看到「界面缩放 UI Zoom」的折叠项即为加载成功。
 
-（`third-party` 下的**每个子文件夹**都会被 tt 酒馆当成一个第三方扩展自动加载，不需要在界面里"安装"。）
-
-### 3. 完全重启 tt 酒馆
-
-点窗口右上角的关闭按钮可能只是**最小化到托盘**，请从**托盘图标右键 → 退出**再重新打开。
-启动后打开 **扩展（Extensions）面板**，能看到「界面缩放 UI Zoom」的折叠项即为加载成功。
+> - 安装走的是酒馆内置的 Git 客户端，**不需要你本机装过 Git**，也会用你在
+>   「TauriTavern 设置 → 出站代理」里配置的代理去连 GitHub。
+> - 如果提示 **`Extension already exists`**：说明这个扩展已经装过了，去「管理扩展」里更新或删除即可，不必重复安装。
+> - 扩展面板右上角的 **「管理扩展」** 可以查看、更新、删除所有第三方扩展。
+> - 网络连不上 GitHub 时，用下面「备用：手动安装」。
 
 ### 更新
 
-用新文件覆盖 `index.js`（必要时还有 `style.css`、`manifest.json`），然后完全重启即可。
+**扩展面板 →「管理扩展」→ 找到「界面缩放 UI Zoom」→ 更新**，然后完全重启 tt 酒馆。
+
+### 备用：手动安装
+
+下载本仓库的 ZIP（或 `git clone`），把文件夹整个复制到 `<数据目录>\extensions\third-party\` 下，
+目录名随意（例如 `ui-zoom`）—— `third-party` 下**每个子文件夹**都会被当成一个第三方扩展自动加载。
+数据目录在 **用户设置 → TauriTavern 设置 → 数据目录** 里能看到（例如本机是 `E:\AI\TauriTavern`）。
+手动放的那份酒馆不会帮你更新，而且**不要和自动安装的那份同时存在**（同时存在会加载两份、互相干扰）。
 
 ---
 
@@ -153,12 +159,14 @@ CSS 像素。两者混用会让**右键菜单、自动补全、Quick Reply 子�
 
 ## 卸载
 
-1. 删除 `<数据目录>\extensions\third-party\ui-zoom` 整个目录；
+1. **扩展面板 →「管理扩展」→「界面缩放 UI Zoom」→ 删除**
+   （手动安装的话就直接删掉 `<数据目录>\extensions\third-party\` 下那个文件夹）；
 2. 完全重启 tt 酒馆；
 3. （可选）删掉 `settings.json → extension_settings` 里的 `tauritavernUiZoom`、
    `tauritavernUiZoomCoordinateFix`、`tauritavernUiZoomPanelGuard` 三个键。
 
-临时关闭则把 `"third-party/ui-zoom"` 加进 `settings.json` 的 `extension_settings.disabledExtensions`。
+临时关闭：把 `"third-party/tauritavern-ui-zoom"`（手动安装的目录名就写实际那个，例如 `"third-party/ui-zoom"`）
+加进 `settings.json` 的 `extension_settings.disabledExtensions`。
 
 ---
 
