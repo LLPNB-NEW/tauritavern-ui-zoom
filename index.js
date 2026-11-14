@@ -866,6 +866,36 @@ function refreshPanel(value) {
     }
 }
 
+function notifyViewportChange() {
+    // Chromium does not fire a resize event when the layout viewport changes because of
+    // CSS zoom on <html>, yet third-party UI keeps px values it measured from the old
+    // viewport (the 4A script stores its panel height in --ufi-viewport-height, for
+    // example). Re-emitting the event lets those overlays re-measure instead of growing
+    // past the bottom of the visible area after a zoom step.
+    const fire = () => {
+        try {
+            window.dispatchEvent(new Event('resize'));
+        } catch {
+            // ignore
+        }
+        const visualViewport = window.visualViewport;
+        if (visualViewport) {
+            try {
+                visualViewport.dispatchEvent(new Event('resize'));
+            } catch {
+                // ignore
+            }
+        }
+    };
+
+    fire();
+    try {
+        window.requestAnimationFrame(fire);
+    } catch {
+        // ignore
+    }
+}
+
 function applyZoom(value, options = {}) {
     const { persist = true, announce = true } = options;
     const next = clampZoom(value);
@@ -883,6 +913,7 @@ function applyZoom(value, options = {}) {
     if (announce) {
         showIndicator(next);
     }
+    notifyViewportChange();
 
     return next;
 }
