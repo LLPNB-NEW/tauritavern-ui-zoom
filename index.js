@@ -167,6 +167,39 @@ const state = {
     styleObserver: null,
 };
 
+/**
+ * Reads the viewport size the way the browser hands it out *before* any patching.
+ *
+ * `visualViewport.height` / `innerHeight` are reported in visual pixels under a CSS
+ * zoom (see the coordinate-space section below), and installCoordinateNormalization()
+ * divides them by the zoom factor. Third-party UI that caches a viewport length adds
+ * its own confusion: it stores the number it read as a CSS length, so with the fix
+ * disabled the cached length is `zoom *` too large. Having the unpatched getters here
+ * is what lets rewriteViewportCustomProperty() tell which of the two worlds a value
+ * came from.
+ */
+const rawViewportSize = (() => {
+    try {
+        const widthGetter = Object.getOwnPropertyDescriptor(window, 'innerWidth')?.get;
+        const heightGetter = Object.getOwnPropertyDescriptor(window, 'innerHeight')?.get;
+        if (typeof widthGetter === 'function' && typeof heightGetter === 'function') {
+            return () => ({
+                width: widthGetter.call(window),
+                height: heightGetter.call(window),
+            });
+        }
+    } catch {
+        // fall through to the derived reader
+    }
+    return () => {
+        const factor = state.coordinateFix ? state.zoom : 1;
+        return {
+            width: window.innerWidth * factor,
+            height: window.innerHeight * factor,
+        };
+    };
+})();
+
 // ---------------------------------------------------------------------------
 // Small helpers
 // ---------------------------------------------------------------------------
@@ -435,6 +468,31 @@ function rewriteInlineValue(value) {
 }
 
 /**
+ * A third-party overlay that caches the viewport size in a custom property
+ * (`panel.style.setProperty('--ufi-viewport-height', '1300px')`, as the 4A script does)
+ * stores a length measured in *visual* pixels and then consumes it as a CSS length, so
+ * the cached length is `zoom` times too large. Rewriting the cached px value to
+ * `calc(<px> / var(--tt-ui-zoom))` keeps such an overlay inside the visible area after a
+ * zoom step, whether or not the coordinate fix is enabled.
+ */
+function rewriteViewportCustomProperty(property, value) {
+    if (typeof property !== 'string' || !property.startsWith('--') || typeof value !== 'string') {
+        return value;
+    }
+    const match = /^\s*(\d+(?:\.\d+)?)px\s*$/.exec(value);
+    if (!match) {
+        return value;
+    }
+    const cached = Number(match[1]);
+    const size = rawViewportSize();
+    const near = (a, b) => Math.abs(a - b) <= 1.5;
+    if (!near(cached, size.height) && !near(cached, size.width)) {
+        return value;
+    }
+    return `calc(${value.trim()} / var(${ZOOM_VAR}))`;
+}
+
+/**
  * Remembers how wide the chat column is, so the side-panel guard only kicks in when
  * the chat leaves no usable gap for the character / AI-configuration panels.
  */
@@ -490,6 +548,7 @@ function installViewportUnitIntercept() {
             noteChatWidth(value);
         }
         if (typeof value === 'string') {
+            value = rewriteViewportCustomProperty(property, value);
             value = rewriteInlineValue(value);
         }
         return original.call(this, property, value, priority);
